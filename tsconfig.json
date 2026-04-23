@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "moduleResolution": "bundler",
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": true,
+    "allowUmdGlobalAccess": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": false,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "lib": ["dom", "ES2019"],
+    "typeRoots": ["./node_modules/@types", "./src/types/*"]
+  }
+}
