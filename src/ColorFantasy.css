@@ -126,6 +126,102 @@
   color: #667eea;
 }
 
+/** Контролы */
+.settings-panel {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.settings__group {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.settings__group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings__group-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #333;
+}
+
+.settings__item {
+  margin-bottom: 12px;
+}
+
+.settings__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.settings__control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings__slider {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #ddd;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.settings__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
+}
+
+.settings__value {
+  min-width: 35px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a90e2;
+}
+
+.settings__hint {
+  font-size: 11px;
+  color: #888;
+  margin: 4px 0 0 0;
+}
+
+.settings__checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.settings__checkbox-input {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.settings__checkbox-label {
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
 /* Контейнер изображений */
 .images-container {
   display: grid;
@@ -182,7 +278,7 @@
   max-width: 100%;
   height: auto;
   display: block;
-  cursor: default;
+  cursor: pointer;
 }
 
 /* Палитра цветов */
@@ -211,7 +307,7 @@
   gap: 1rem;
 }
 
-.palette-item {
+.palette__item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -222,7 +318,7 @@
   transition: transform 0.2s ease;
 }
 
-.palette-item:hover {
+.palette__item:hover {
   transform: translateX(5px);
   border-color: #667eea;
 }
@@ -234,10 +330,6 @@
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
-}
-
-.palette-item__info {
-  flex: 1;
 }
 
 .palette-item__label {
@@ -304,4 +396,248 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Модальное окно */
+.color-fantasy__modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+}
+
+.color-fantasy__modal--visible {
+  display: block;
+}
+
+.color-fantasy__modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.color-fantasy__modal-container {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 100%;
+  max-width: 90vw;
+  height: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+.color-fantasy__modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #666;
+}
+
+.color-fantasy__modal-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  overscroll-behavior: none;
+}
+
+.color-fantasy__modal-image {
+  height: 100%;
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+.color-fantasy__modal-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+.color-fantasy__modal-controls button {
+  padding: 8px 16px;
+  background: #f0f0f0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Экспорт модальное окно */
+.color-fantasy__export-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+}
+
+.color-fantasy__export-modal--visible {
+  display: block;
+}
+
+.color-fantasy__export-modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.color-fantasy__export-modal-container {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+.color-fantasy__export-modal-title {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+}
+
+.color-fantasy__export-option {
+  margin-bottom: 15px;
+}
+
+.color-fantasy__export-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.color-fantasy__export-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.color-fantasy__export-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.color-fantasy__export-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.color-fantasy__export-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.color-fantasy__export-cancel {
+  background: #f0f0f0;
+}
+
+.color-fantasy__export-confirm {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+/* Селект для пресетов */
+.settings__select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+}
+
+/* Числовой инпут */
+.settings__number {
+  width: 70px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.settings__number:disabled {
+  background: #f5f5f5;
+  color: #999;
+}
+
+/* Switch toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: #667eea;
+}
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+.switch-label {
+  font-size: 13px;
+  color: #1e293b;
 }

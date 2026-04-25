@@ -23,6 +23,8 @@ export class RegionFinder {
   private tolerance: number;
   /** Минимальный размер области */
   private minRegionSize: number;
+  /** Временное хранилище для мелких областей (артефакты) */
+  private tinyRegions: ColorRegion[] = [];
 
   /**
    * @param {ImageData} imageData - данные изображения
@@ -36,6 +38,7 @@ export class RegionFinder {
     this.tolerance = tolerance;
     this.minRegionSize = minRegionSize;
     this.visited = new Uint8Array(this.width * this.height);
+    this.tinyRegions = [];
   }
 
   /**
@@ -45,6 +48,7 @@ export class RegionFinder {
    */
   public find = (): ColorRegion[] => {
     const regions: ColorRegion[] = [];
+    this.tinyRegions = [];
 
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
@@ -55,7 +59,7 @@ export class RegionFinder {
           const startIdx = this.getDataIndex(x, y);
           const region = this.floodFill(x, y, startIdx);
 
-          if (region) {
+          if (region && !region.isTiny) {
             region.id = regions.length;
             region.label = regions.length.toString();
             regions.push(region);
@@ -64,8 +68,11 @@ export class RegionFinder {
       }
     }
 
+    /** Объединяем мелкие области с ближайшими нормальными */
+    this.mergeTinyRegions(regions);
+
     return regions;
-  }
+  };
 
   /**
    * Получить индекс в массиве данных по координатам (4 байта на пиксель)
@@ -75,7 +82,7 @@ export class RegionFinder {
    */
   private getDataIndex = (x: number, y: number): number => {
     return (y * this.width + x) * 4;
-  }
+  };
 
   /**
    * Получить плоский индекс для visited массива
@@ -85,7 +92,7 @@ export class RegionFinder {
    */
   private getFlatIndex = (x: number, y: number): number => {
     return y * this.width + x;
-  }
+  };
 
   /**
    * Алгоритм заливки (Flood Fill) с использованием BFS
@@ -146,13 +153,32 @@ export class RegionFinder {
       if (x < this.width - 1 && y < this.height - 1) queue.push([x + 1, y + 1]);
     }
 
-    /** Отбрасываем слишком маленькие области (шум) */
-    if (pixels.length < this.minRegionSize) return null;
+    /** Сохраняем слишком маленькие области (шум) в отдельный массив для последующего объединения */
+    if (pixels.length < this.minRegionSize) {
+      const centroid = { x: Math.round(sumX / pixels.length), y: Math.round(sumY / pixels.length) };
+      const center = computeBoundsCenter(bounds);
+      const averageColor = computeAverageColor(pixels, this.data, (x, y) => this.getDataIndex(x, y));
+
+      const tinyRegion: ColorRegion = {
+        id: 0,
+        label: "",
+        center,
+        centroid,
+        color: averageColor,
+        pixels,
+        bounds,
+        isTiny: true,
+      };
+
+      this.tinyRegions.push(tinyRegion);
+
+      return null;
+    }
 
     /** Вычисляем характеристики области */
-    const averageColor = computeAverageColor(pixels, this.data, (x, y) => this.getDataIndex(x, y));
     const centroid = { x: Math.round(sumX / pixels.length), y: Math.round(sumY / pixels.length) };
     const center = computeBoundsCenter(bounds);
+    const averageColor = computeAverageColor(pixels, this.data, (x, y) => this.getDataIndex(x, y));
 
     return {
       id: 0,
@@ -162,6 +188,75 @@ export class RegionFinder {
       color: averageColor,
       pixels,
       bounds,
+      isTiny: false,
     };
+  };
+
+  /**
+   * Объединяет мелкие области с ближайшими нормальными
+   * @param {ColorRegion[]} normalRegions - список нормальных областей
+   */
+  private mergeTinyRegions(normalRegions: ColorRegion[]): void {
+    for (const tiny of this.tinyRegions) {
+      /** Находим ближайший нормальный регион по центроиду */
+      const nearestRegion = this.findNearestRegion(tiny.centroid, normalRegions);
+
+      /** Если нашли ближайший - присоединяем мелкую область к нему */
+      if (nearestRegion) this.updateRegionAfterMerge(nearestRegion, tiny.pixels);
+    }
+  }
+
+  /**
+   * Находит ближайший регион к заданной точке
+   * @param {Pixel} point - точка
+   * @param {ColorRegion[]} regions - список регионов
+   * @returns {ColorRegion | null} ближайший регион
+   */
+  private findNearestRegion(point: Pixel, regions: ColorRegion[]): ColorRegion | null {
+    let minDist = Infinity;
+    let nearest = null;
+
+    for (const region of regions) {
+      const dist = Math.hypot(point.x - region.centroid.x, point.y - region.centroid.y);
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = region;
+      }
+    }
+
+    return nearest;
+  }
+
+  /**
+   * Обновляет характеристики региона после добавления пикселей
+   * @param {ColorRegion} region - регион для обновления
+   * @param {Pixel[]} newPixels - новые пиксели
+   */
+  private updateRegionAfterMerge(region: ColorRegion, newPixels: Pixel[]): void {
+    /** Добавляем новые пиксели */
+    region.pixels.push(...newPixels);
+
+    /** Пересчитываем центроид */
+    let sumX = 0,
+      sumY = 0;
+
+    for (const p of region.pixels) {
+      sumX += p.x;
+      sumY += p.y;
+    }
+
+    region.centroid = {
+      x: Math.round(sumX / region.pixels.length),
+      y: Math.round(sumY / region.pixels.length),
+    };
+
+    /** Пересчитываем границы */
+    for (const p of newPixels) {
+      region.bounds.minX = Math.min(region.bounds.minX, p.x);
+      region.bounds.maxX = Math.max(region.bounds.maxX, p.x);
+      region.bounds.minY = Math.min(region.bounds.minY, p.y);
+      region.bounds.maxY = Math.max(region.bounds.maxY, p.y);
+    }
+    region.center = computeBoundsCenter(region.bounds);
   }
 }

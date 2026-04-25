@@ -10,16 +10,20 @@ export class OutlineDrawer {
   private width: number;
   /** Высота канваса */
   private height: number;
+  /** Использовать 8 направлений для определения границ (толще контуры) */
+  private use8Connectivity: boolean;
 
   /**
    * @param {CanvasRenderingContext2D} ctx - контекст для рисования
    * @param {number} width - ширина канваса
    * @param {number} height - высота канваса
+   * @param {boolean} use8Connectivity - использовать 8-связность (по умолчанию false для тонких контуров)
    */
-  constructor(ctx: CanvasRenderingContext2D, width: number, height: number) {
+  constructor(ctx: CanvasRenderingContext2D, width: number, height: number, use8Connectivity: boolean = false) {
     this.ctx = ctx;
     this.width = width;
     this.height = height;
+    this.use8Connectivity = use8Connectivity;
   }
 
   /**
@@ -34,13 +38,17 @@ export class OutlineDrawer {
     this.ctx.fillRect(0, 0, this.width, this.height);
 
     const regionMap = this.buildRegionMap(regions);
+    const drawn = new Set<string>();
 
     /** Рисуем граничные пиксели черным цветом */
     for (const region of regions) {
       for (const { x, y } of region.pixels) {
+        const key = `${x},${y}`;
+        if (drawn.has(key)) continue;
         if (this.isBorderPixel(x, y, region.id, regionMap)) {
           this.ctx.fillStyle = "black";
           this.ctx.fillRect(x, y, 1, 1);
+          drawn.add(key);
         }
       }
     }
@@ -89,7 +97,7 @@ export class OutlineDrawer {
 
   /**
    * Проверяет, является ли пиксель граничным
-   * Пиксель считается граничным, если любой из его 4 соседей:
+   * Пиксель считается граничным, если любой из его 4 или 8 соседей:
    * - находится за пределами изображения
    * - принадлежит другой области
    * @param {number} x - координата X
@@ -100,16 +108,23 @@ export class OutlineDrawer {
    */
   private isBorderPixel(x: number, y: number, regionId: number, regionMap: Map<string, number>): boolean {
     /** 4 основных направления (крест) для определения границы */
-    const neighbors: Array<[number, number]> = [
+    const neighbors4: Array<[number, number]> = [
       [x - 1, y],
       [x + 1, y],
       [x, y - 1],
       [x, y + 1],
+    ];
+
+    /** Диагонали для 8-связности */
+    const neighbors8: Array<[number, number]> = [
+      ...neighbors4,
       [x - 1, y - 1],
       [x - 1, y + 1],
       [x + 1, y - 1],
       [x + 1, y + 1],
     ];
+
+    const neighbors = this.use8Connectivity ? neighbors8 : neighbors4;
 
     for (const [nx, ny] of neighbors) {
       /** Граница изображения */
@@ -122,6 +137,7 @@ export class OutlineDrawer {
         return true;
       }
     }
+
     return false;
   }
 
