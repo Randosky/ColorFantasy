@@ -40,8 +40,9 @@ export class ColorPalette {
       const colorItem = document.createElement("div");
       colorItem.className = "palette__item";
       colorItem.innerHTML = `
-        <div class="palette__color" style="background: rgb(${region.color.r}, ${region.color.g}, ${region.color.b})"></div>
-        <div class="palette__label">${region.label}</div>
+        <div class="palette-item__color" style="background: rgb(${region.color.r}, ${region.color.g}, ${region.color.b})"></div>
+        <div class="palette-item__label">${region.label}</div>
+        <div class="palette-item__value">rgb(${region.color.r}, ${region.color.g}, ${region.color.b})</div>
       `;
       this.paletteContainer.appendChild(colorItem);
     }

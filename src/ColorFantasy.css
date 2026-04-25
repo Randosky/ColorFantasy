@@ -126,6 +126,102 @@
   color: #667eea;
 }
 
+/** Контролы */
+.settings-panel {
+  background: #f5f5f5;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.settings__group {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.settings__group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings__group-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: #333;
+}
+
+.settings__item {
+  margin-bottom: 12px;
+}
+
+.settings__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.settings__control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings__slider {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #ddd;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.settings__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4a90e2;
+  cursor: pointer;
+}
+
+.settings__value {
+  min-width: 35px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a90e2;
+}
+
+.settings__hint {
+  font-size: 11px;
+  color: #888;
+  margin: 4px 0 0 0;
+}
+
+.settings__checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.settings__checkbox-input {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.settings__checkbox-label {
+  font-size: 13px;
+  color: #555;
+  cursor: pointer;
+}
+
 /* Контейнер изображений */
 .images-container {
   display: grid;
@@ -211,7 +307,7 @@
   gap: 1rem;
 }
 
-.palette-item {
+.palette__item {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -222,7 +318,7 @@
   transition: transform 0.2s ease;
 }
 
-.palette-item:hover {
+.palette__item:hover {
   transform: translateX(5px);
   border-color: #667eea;
 }
@@ -234,10 +330,6 @@
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
-}
-
-.palette-item__info {
-  flex: 1;
 }
 
 .palette-item__label {

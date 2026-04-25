@@ -53,6 +53,8 @@ export interface ColorRegion {
   centroid: Point;
   /** Границы области */
   bounds: Bounds;
+  /** Является ли область маленькой */
+  isTiny: boolean;
 }
 
 /**
