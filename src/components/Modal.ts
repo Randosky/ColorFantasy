@@ -64,18 +64,18 @@ export class Modal {
     this.imageElement?.addEventListener("click", e => {
       if (!this.imageElement) return;
 
-      this.zoom(e.shiftKey ? 0.8 : 1.2);
+      this.zoom(e.ctrlKey ? 0.8 : 1.2);
     });
 
-    /** Следим за нажатием и отпусканием Shift глобально */
+    /** Следим за нажатием и отпусканием ctrl глобально */
     window.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.key === "Shift" && this.isVisible() && this.imageElement) {
+      if (e.key === "Control" && this.isVisible() && this.imageElement) {
         this.imageElement.style.cursor = "zoom-out";
       }
     });
 
     window.addEventListener("keyup", (e: KeyboardEvent) => {
-      if (e.key === "Shift" && this.isVisible() && this.imageElement) {
+      if (e.key === "Control" && this.isVisible() && this.imageElement) {
         this.imageElement.style.cursor = "zoom-in";
       }
     });
