@@ -184,17 +184,19 @@ class ColorFantasy {
               <h4 class="settings__group-title">✏️ Стиль отображения</h4>
               <div class="settings__item">
                 <label class="settings__checkbox">
-                  <input type="checkbox" id="previewMode" class="settings__checkbox-input">
-                  <span class="settings__checkbox-label">👁️ Режим предпросмотра (цветные области)</span>
-                </label>
-              </div>
-              <div class="settings__item">
-                <label class="settings__checkbox">
                   <input type="checkbox" id="use8Connectivity" class="settings__checkbox-input">
                   <span class="settings__checkbox-label">Использовать 8-связность для границ</span>
                 </label>
                 <p class="settings__hint">⚠️ Делает контуры толще (обычно не нужно для раскраски)</p>
               </div>
+            </div>
+
+            <div class="settings__group">
+              <label class="switch">
+                <input type="checkbox" id="previewModeSwitch">
+                <span class="slider round"></span>
+              </label>
+              <span class="switch-label">🎨 Режим предпросмотра (цвета областей)</span>
             </div>
           </div>
 
@@ -416,10 +418,10 @@ class ColorFantasy {
     }
 
     /** Режим предпросмотра */
-    const previewCheckbox = document.getElementById("previewMode") as HTMLInputElement;
-    if (previewCheckbox) {
-      this.isPreviewMode = previewCheckbox.checked;
-      previewCheckbox.addEventListener("change", e => {
+    const previewSwitch = document.getElementById("previewModeSwitch") as HTMLInputElement;
+    if (previewSwitch) {
+      this.isPreviewMode = previewSwitch.checked;
+      previewSwitch.addEventListener("change", e => {
         this.isPreviewMode = (e.target as HTMLInputElement).checked;
         if (this.regions.length && this.ctx && this.canvas) {
           this.redrawColoring();
@@ -501,7 +503,7 @@ class ColorFantasy {
     if (!this.originalImage || !this.canvas || !this.ctx) return;
 
     this.progress?.show(true);
-    this.progress?.updateText("Подготовка изображения...");
+    await this.progress?.updateText("Подготовка изображения...");
 
     /** Небольшая задержка для отображения прогресса */
     await new Promise(resolve => setTimeout(resolve, 50));
@@ -517,7 +519,7 @@ class ColorFantasy {
 
       /** Шаг 2.5: Удаление фона (опционально) */
       if (this.removeBackgroundEnabled) {
-        this.progress?.updateText("Удаление фона...");
+        await this.progress?.updateText("Удаление фона...");
         this.backgroundRemover = new BackgroundRemover(this.ctx, this.canvas.width, this.canvas.height);
         this.backgroundRemover.setImageData(imageData);
         const newCanvas = this.backgroundRemover.applyAndRender(this.backgroundTolerance);
@@ -527,14 +529,14 @@ class ColorFantasy {
         }
       }
 
-      this.progress?.updateText("Поиск цветовых областей...");
+      await this.progress?.updateText("Поиск цветовых областей...");
 
       /** Шаг 3: Находим связанные цветовые области */
       const finder = new RegionFinder(imageData, this.regionTolerance, this.minRegionSize);
       const rawRegions = finder.find();
 
       console.log(`Найдено областей до объединения: ${rawRegions.length}`);
-      this.progress?.updateText(`Найдено ${rawRegions.length} областей, объединение...`);
+      await this.progress?.updateText(`Найдено ${rawRegions.length} областей, объединение...`);
 
       /** Шаг 4: Объединяем области с настройками */
       const merger = new RegionMerger(this.mergeTolerance, imageData, this.canvas.width);
@@ -544,12 +546,12 @@ class ColorFantasy {
 
       /** Шаг 4.5: Сокращаем до желаемого количества цветов (если включено) */
       if (this.useColorCountLimit && this.desiredColorCount < this.regions.length) {
-        this.progress?.updateText(`Сокращение до ${this.desiredColorCount} цветов...`);
+        await this.progress?.updateText(`Сокращение до ${this.desiredColorCount} цветов...`);
         this.regions = merger.reduceToCount(this.regions, this.desiredColorCount);
         console.log(`После сокращения: ${this.regions.length} областей`);
       }
 
-      this.progress?.updateText("Создание контуров раскраски...");
+      await this.progress?.updateText("Создание контуров раскраски...");
 
       /** Шаг 5: Создаём режим предпросмотра */
       this.previewMode = new PreviewMode(this.ctx, this.canvas.width, this.canvas.height);

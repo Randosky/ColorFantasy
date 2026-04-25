@@ -1,7 +1,7 @@
 import { ColorRegion } from "@/ColorFantasy.types";
 
 /**
- * Режим предпросмотра отображает области разными цветами
+ * Режим предпросмотра отображает области цветами из палитры
  * @class
  */
 export class PreviewMode {
@@ -17,18 +17,7 @@ export class PreviewMode {
   }
 
   /**
-   * Генерирует случайный цвет на основе ID области
-   * @param {number} id - ID области
-   * @returns {string} цвет в формате RGB
-   */
-  private getRegionColor(id: number): string {
-    /** Используем предсказуемые цвета на основе ID */
-    const hue = (id * 137) % 360;
-    return `hsl(${hue}, 70%, 60%)`;
-  }
-
-  /**
-   * Отрисовывает предпросмотр областей разными цветами
+   * Отрисовывает предпросмотр областей их собственными цветами
    * @param {ColorRegion[]} regions - массив областей
    * @returns {void}
    */
@@ -36,9 +25,9 @@ export class PreviewMode {
     if (!this.isActive) return;
 
     for (const region of regions) {
-      const color = this.getRegionColor(region.id);
-      this.ctx.fillStyle = color;
-      this.ctx.globalAlpha = 0.7;
+      const { r, g, b, a } = region.color;
+      this.ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+      this.ctx.globalAlpha = a / 255;
 
       for (const { x, y } of region.pixels) {
         this.ctx.fillRect(x, y, 1, 1);

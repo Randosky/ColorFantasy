@@ -38,13 +38,17 @@ export class OutlineDrawer {
     this.ctx.fillRect(0, 0, this.width, this.height);
 
     const regionMap = this.buildRegionMap(regions);
+    const drawn = new Set<string>();
 
     /** Рисуем граничные пиксели черным цветом */
     for (const region of regions) {
       for (const { x, y } of region.pixels) {
+        const key = `${x},${y}`;
+        if (drawn.has(key)) continue;
         if (this.isBorderPixel(x, y, region.id, regionMap)) {
           this.ctx.fillStyle = "black";
           this.ctx.fillRect(x, y, 1, 1);
+          drawn.add(key);
         }
       }
     }

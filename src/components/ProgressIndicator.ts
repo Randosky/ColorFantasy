@@ -27,11 +27,13 @@ export class ProgressIndicator {
   /**
    * Обновляет текст прогресса
    * @param {string} text - текст прогресса
-   * @returns {void}
+   * @returns {Promise<void>} - промис
    */
-  public updateText = (text: string): void => {
+  public updateText = async (text: string): Promise<void> => {
     const progressText = document.getElementById("progressText");
 
     if (progressText) progressText.textContent = text;
+
+    await new Promise(resolve => requestAnimationFrame(resolve));
   };
 }
