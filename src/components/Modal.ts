@@ -5,6 +5,7 @@
 export class Modal {
   private modalElement: HTMLElement | null = null;
   private imageElement: HTMLImageElement | null = null;
+  private currentScale: number = 1;
 
   constructor() {
     this.createModal();
@@ -58,6 +59,26 @@ export class Modal {
     zoomIn?.addEventListener("click", () => this.zoom(1.2));
     zoomOut?.addEventListener("click", () => this.zoom(0.8));
     reset?.addEventListener("click", () => this.resetZoom());
+
+    /** Клик по изображению */
+    this.imageElement?.addEventListener("click", e => {
+      if (!this.imageElement) return;
+
+      this.zoom(e.shiftKey ? 0.8 : 1.2);
+    });
+
+    /** Следим за нажатием и отпусканием Shift глобально */
+    window.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Shift" && this.isVisible() && this.imageElement) {
+        this.imageElement.style.cursor = "zoom-out";
+      }
+    });
+
+    window.addEventListener("keyup", (e: KeyboardEvent) => {
+      if (e.key === "Shift" && this.isVisible() && this.imageElement) {
+        this.imageElement.style.cursor = "zoom-in";
+      }
+    });
   }
 
   /**
@@ -69,6 +90,7 @@ export class Modal {
     if (!this.modalElement || !this.imageElement) return;
     this.imageElement.src = imageSrc;
     this.modalElement.classList.add("color-fantasy__modal--visible");
+
     this.resetZoom();
   }
 
@@ -95,10 +117,8 @@ export class Modal {
    * @returns {void}
    */
   private zoom(factor: number): void {
-    if (!this.imageElement) return;
-    const currentScale = this.getCurrentScale();
-    const newScale = currentScale * factor;
-    this.imageElement.style.transform = `scale(${newScale})`;
+    this.currentScale = this.currentScale * factor;
+    this.changeStyle();
   }
 
   /**
@@ -106,21 +126,23 @@ export class Modal {
    * @returns {void}
    */
   private resetZoom(): void {
-    if (!this.imageElement) return;
-    this.imageElement.style.transform = "scale(1)";
+    this.currentScale = 1;
+    this.changeStyle();
   }
 
   /**
-   * Получает текущий масштаб изображения
-   * @returns {number}
+   * Изменяет стиль элемента
+   * @returns {void}
    */
-  private getCurrentScale(): number {
-    if (!this.imageElement) return 1;
-    const transform = this.imageElement.style.transform;
-    if (transform && transform.includes("scale")) {
-      const match = transform.match(/scale\(([\d.]+)\)/);
-      if (match) return parseFloat(match[1]);
+  private changeStyle(): void {
+    if (!this.imageElement) return;
+
+    if (this.currentScale > 1) {
+      this.imageElement.style.transformOrigin = "left top";
+    } else {
+      this.imageElement.style.transformOrigin = "center center";
     }
-    return 1;
+
+    this.imageElement.style.transform = `scale(${this.currentScale})`;
   }
 }

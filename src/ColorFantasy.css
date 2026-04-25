@@ -452,15 +452,16 @@
 }
 
 .color-fantasy__modal-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: auto;
   overscroll-behavior: none;
 }
 
 .color-fantasy__modal-image {
+  height: 100%;
   cursor: zoom-in;
   transition: transform 0.2s ease;
   user-select: none;

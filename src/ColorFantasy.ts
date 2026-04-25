@@ -505,9 +505,6 @@ class ColorFantasy {
     this.progress?.show(true);
     await this.progress?.updateText("Подготовка изображения...");
 
-    /** Небольшая задержка для отображения прогресса */
-    await new Promise(resolve => setTimeout(resolve, 50));
-
     try {
       /** Шаг 1: Устанавливаем размеры канваса под изображение */
       this.canvas.width = this.originalImage.width;

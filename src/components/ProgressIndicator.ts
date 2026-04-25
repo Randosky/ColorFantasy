@@ -35,5 +35,7 @@ export class ProgressIndicator {
     if (progressText) progressText.textContent = text;
 
     await new Promise(resolve => requestAnimationFrame(resolve));
+    /** Небольшая задержка для отображения прогресса */
+    await new Promise(resolve => setTimeout(resolve, 50));
   };
 }
